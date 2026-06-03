@@ -1,0 +1,12 @@
+**.exe
+**/out
+**.a
+**.so
+**.dll
+**.lib
+**/.cache
+**/out.png
+**/build
+**/cmake-*
+
+
