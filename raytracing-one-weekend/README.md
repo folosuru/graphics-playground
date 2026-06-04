@@ -11,12 +11,21 @@ git hooksにより、raytracing-one-weekend/ 配下に変更があった場合�
 
 ```
 #!/bin/sh
-if git diff --quiet --exit-code  -- ./raytracing-one-weekend/; then
-  if git diff --quiet --exit-code  -- ./raytracing-one-weekend/DIARY.md; then
+
+if git diff --cached --quiet --exit-code  -- ./raytracing-one-weekend/; then
+  echo '?'
+else 
+  DIARY_FILE="./raytracing-one-weekend/DIARY.md"
+  if git diff --cached --quiet --exit-code  -- "$DIARY_FILE"; then
     echo "DIARY.mdに変更がない"
     exit 1
   else
-    echo 'ok'
+    TARGET_LINE=$(grep -n "## HEAD" $DIARY_FILE | sed -n '1s/:.*//p')
+    if [ -n "$TARGET_LINE" ]; then
+      COMMIT_HASH=$(git rev-parse --short HEAD)
+      sed -i "${TARGET_LINE}s/## HEAD/## $COMMIT_HASH/" $DIARY_FILE 
+      git add $DIARY_FILE
+    fi
     exit 0
   fi
 fi
