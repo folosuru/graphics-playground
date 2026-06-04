@@ -13,7 +13,7 @@ git hooksにより、raytracing-one-weekend/ 配下に変更があった場合�
 #!/bin/sh
 
 if git diff --cached --quiet --exit-code  -- ./raytracing-one-weekend/; then
-  echo '?'
+  :
 else 
   DIARY_FILE="./raytracing-one-weekend/DIARY.md"
   if git diff --cached --quiet --exit-code  -- "$DIARY_FILE"; then
