@@ -1,13 +1,15 @@
 #ifndef INCLUDE_SRC_SPHERE_HPP_
 #define INCLUDE_SRC_SPHERE_HPP_
 #include <cmath>
+#include <memory>
 
 #include "hittable.hpp"
 
 class Sphere : public Hittable {
 public:
     Sphere() {}
-    Sphere(Point3 cen, double r) : center(cen), radius(r) {}
+    Sphere(Point3 cen, double r, std::shared_ptr<material> m)
+        : center(cen), radius(r), material_(m) {}
 
     bool hit(const ray& r, double tmin, double tmax,
              HitRecord& rec) const override;
@@ -15,6 +17,7 @@ public:
 public:
     Point3 center;
     double radius;
+    std::shared_ptr<material> material_;
 };
 
 bool Sphere::hit(const ray& r, double tmin, double tmax, HitRecord& rec) const {
@@ -37,6 +40,7 @@ bool Sphere::hit(const ray& r, double tmin, double tmax, HitRecord& rec) const {
             rec.t = temp_t;
             rec.p = r.at(temp_t);
             rec.set_face_normal(r, (rec.p - center) / radius);
+            rec.material_ = material_.get();
             return true;
         }
         temp_t = (-b + D_sqrt) / a;
@@ -44,6 +48,7 @@ bool Sphere::hit(const ray& r, double tmin, double tmax, HitRecord& rec) const {
             rec.t = temp_t;
             rec.p = r.at(temp_t);
             rec.set_face_normal(r, (rec.p - center) / radius);
+            rec.material_ = material_.get();
             return true;
         }
     }
