@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include <ostream>
+
+#include "math_util.hpp"
 struct Vec3 {
     using RealType = double;
 
@@ -43,6 +45,13 @@ struct Vec3 {
 
     double length_squared() const {
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
+    }
+    inline static Vec3 random() {
+        return {random_double(), random_double(), random_double()};
+    }
+    inline static Vec3 random(double min, double max) {
+        return {random_double(min, max), random_double(min, max),
+                random_double(min, max)};
     }
 };
 using Color = Vec3;
@@ -92,6 +101,13 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
 
 inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
+}
+
+inline Vec3 random_unit_sphere_vector() {
+    auto a = random_double(0, 2 * pi);
+    auto z = random_double(-1, 1);
+    auto r = sqrt(1 - z * z);
+    return Vec3(r * cos(a), r * sin(a), z);
 }
 
 #endif  // VEC3_HPP

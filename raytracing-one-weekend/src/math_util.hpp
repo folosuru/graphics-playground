@@ -13,7 +13,18 @@ inline double degrees_to_radians(double degrees) {
     return degrees * pi / 180;
 }
 
+inline float fast_rand_float() {
+    static uint32_t x = 2463534242;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    uint32_t tmp = (x >> 9) | 0x3F800000;
+    return *(float *)&tmp - 1.0f;
+}
+
 inline double random_double() {
+    //mt19937ぶん回すのはちょいおそい　精度いらなそうだしXORShiftで済ます
+    return fast_rand_float();
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     static std::mt19937 generator;
     return distribution(generator);

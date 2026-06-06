@@ -1,5 +1,6 @@
 #ifndef COLOR_HPP_
 #define COLOR_HPP_
+#include <algorithm>
 #include <iostream>
 #include <ostream>
 
@@ -11,4 +12,12 @@ void write_color(std::ostream& os, Color c) {
        << static_cast<char>(255.999 * c.z());
 }
 
+void write_color(std::ostream& os, Color c, int samples) {
+    using std::clamp;
+    c /= samples;
+
+    os << static_cast<char>(255.999 * clamp(sqrt(c.x()), 0.0, 0.999))
+       << static_cast<char>(255.999 * clamp(sqrt(c.y()), 0.0, 0.999))
+       << static_cast<char>(255.999 * clamp(sqrt(c.z()), 0.0, 0.999));
+}
 #endif  // COLOR_HPP_

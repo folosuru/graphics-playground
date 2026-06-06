@@ -6,8 +6,8 @@ struct ray {
     ray() {}
     ray(const Point3& orig, const Vec3& dir) : origin_(orig), direction_(dir) {}
 
-    Point3 origin() const { return origin_; }
-    Vec3 direction() const { return direction_; }
+    inline Point3 origin() const { return origin_; }
+    inline Vec3 direction() const { return direction_; }
 
     Point3 at(double t) const { return origin_ + (t * direction_); }
 
