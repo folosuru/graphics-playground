@@ -1,32 +1,25 @@
 #include <chrono>
+#include <cmath>
 #include <iostream>
+#include <memory>
 #include <ostream>
 #include <thread>
 
 #include "color.hpp"
+#include "hittable.hpp"
+#include "hittables.hpp"
+#include "math_util.hpp"
 #include "ray.hpp"
+#include "sphere.hpp"
 #include "vec3.hpp"
 
-bool hit_sphere(const Point3& center, double r, const ray& ray) {
-    // 式は
-    // b^2 * t^w + 2b * (A-C) * t  + (A-C) * (A-C) - r^2
+using std::sqrt;
 
-    // = A-C
-    Vec3 oc = ray.origin() - center;
-    // b^2
-    auto a = dot(ray.direction(), ray.direction());
-    // 2b * (A - C)
-    auto b = 2.0 * dot(oc, ray.direction());
-    // (A-C) * (A-C) - r^2
-    auto c = dot(oc, oc) - r * r;
-
-    auto D = b * b - (4 * a * c);
-    return (D > 0);
-}
-
-Color ray_color(const ray& r) {
-    if (hit_sphere(Point3{0, 0, -1}, 0.5, r)) {
-        return Color{1, 0, 0};
+Color ray_color(const ray& r, const Hittable& hittable) {
+    HitRecord rec;
+    Vec3 sphere_center{0, 0, -1};
+    if (hittable.hit(r, 0, Infinity, rec)) {
+        return 0.5 * (rec.normal + Vec3(1, 1, 1));
     }
     Vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -42,6 +35,11 @@ int main(int argc, char *argv[]) {
     auto viewport_height = 2.0;
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 1.0;
+    Hittables world;
+    world.add(std::make_shared<Sphere>(Vec3{-1.5, 0, -1}, 0.5));
+    world.add(std::make_shared<Sphere>(Vec3{-1, 0, -1.5}, 0.5));
+    world.add(std::make_shared<Sphere>(Vec3{-0.5, 0, -2}, 0.5));
+    world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
 
     auto origin = Point3(0, 0, 0);
     auto horizontal = Vec3(viewport_width, 0, 0);
@@ -56,7 +54,7 @@ int main(int argc, char *argv[]) {
             auto v = double(j) / (image_height - 1);
             ray r(origin,
                   lower_left_corner + u * horizontal + v * vertical - origin);
-            Color pixel_color = ray_color(r);
+            Color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
