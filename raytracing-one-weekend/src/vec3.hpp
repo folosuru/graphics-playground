@@ -5,8 +5,10 @@
 #include <ostream>
 
 #include "math_util.hpp"
+using std::cos;
+using std::sin;
 using std::sqrt;
-
+using std::tan;
 struct Vec3 {
     RealType e[3];
     Vec3() : e{0, 0, 0} {}
@@ -108,6 +110,12 @@ inline Vec3 random_unit_sphere_vector() {
     auto z = random_double(-1, 1);
     auto r = sqrt(1 - z * z);
     return Vec3(r * cos(a), r * sin(a), z);
+}
+
+inline Vec3 random_unit_disk_vector() {
+    auto r = random_double(0, 2 * pi);
+    auto l = random_double();
+    return Vec3{sin(r) * l, cos(r) * l, 0};
 }
 
 inline Vec3 reflect(const Vec3& v, const Vec3& n) {

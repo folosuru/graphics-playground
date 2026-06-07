@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+OUPUT="out.png"
 g++ ./src/main.cpp -o ./out -march=native -O5 -fopenmp\
-  && rm -f out.png \
-  && ./out | ffmpeg -r 5 -f rawvideo -pixel_format rgb24 -video_size 384x216  -i - ./out.gif &> /dev/null
+  && rm -f $OUPUT \
+  && ./out | ffmpeg -r 5 -f rawvideo -pixel_format rgb24 -video_size 640x360  -i - $OUPUT &> /dev/null

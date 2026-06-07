@@ -42,11 +42,31 @@ Color ray_color(const ray& r, const Hittable& hittable, int depth = 10) {
     return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
+void add_cubes(Hittables& world) {
+    std::shared_ptr<material> mats[] = {
+        std::make_shared<lambertian>(Color{0.9, 0.3, 0.3}),
+        std::make_shared<lambertian>(Color{0.3, 0.7, 0.9}),
+        std::make_shared<lambertian>(Color{0.1, 0.9, 0.1}),
+        std::make_shared<lambertian>(Color{0.1, 0.5, 0.5}),
+        std::make_shared<lambertian>(Color{0.1, 0.1, 0.2}),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.3}, 0.5),
+        std::make_shared<metal>(Color{0.1, 0.8, 0.3}, 0.5),
+        std::make_shared<dielectric>(1.5),
+    };
+
+    for (int i = 0; i < 128; i++) {
+        Vec3 pos{random_double(-3, 3), 0.1, random_double(-5, 1)};
+        world.add(std::make_shared<Sphere>(
+            pos, 0.1, mats[rand() % (sizeof(mats) / sizeof(mats[0]))]));
+    }
+}
+
 int main(int argc, char *argv[]) {
     constexpr auto aspect_ratio = 16.0 / 9.0;
-    constexpr int image_width = 384;
+    constexpr int image_width = 640;
     constexpr int image_height = image_width / aspect_ratio;
-    constexpr int samples_per_pixel = 100;
+    constexpr int samples_per_pixel = 500;
     std::cerr << "image size: " << image_width << 'x' << image_height << "\n";
 
     auto viewport_height = 2.0;
@@ -55,36 +75,30 @@ int main(int argc, char *argv[]) {
     Hittables world;
 
     std::shared_ptr<material> mats[] = {
-        std::make_shared<lambertian>(Color{0.9, 0.3, 0.3}),
-        std::make_shared<lambertian>(Color{0.3, 0.7, 0.6}),
-        std::make_shared<lambertian>(Color{0.1, 0.3, 0.5}),
+        std::make_shared<lambertian>(Color{0.7, 0.7, 0.7}),
+        std::make_shared<lambertian>(Color{0.7, 0.2, 0.3}),
         std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
-        std::make_shared<metal>(Color{0.8, 0.8, 0.3}, 0.5),
-        std::make_shared<dielectric>(1.5),
-        std::make_shared<dielectric>(0.33),
-    };
-    world.add(std::make_shared<Sphere>(Vec3{-1.5, 0, -1}, 0.5, mats[0]));
-    world.add(std::make_shared<Sphere>(Vec3{-1, 0, -2}, 0.5, mats[1]));
-    world.add(std::make_shared<Sphere>(Vec3{0, 0, -2}, 0.5, mats[2]));
-    world.add(std::make_shared<Sphere>(Vec3{1.5, 0, -1}, 0.5, mats[4]));
-    world.add(std::make_shared<Sphere>(Vec3{0.25, -0.25, -1}, 0.25, mats[5]));
-    world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100, mats[2]));
+        std::make_shared<dielectric>(1.5)};
+    world.add(std::make_shared<Sphere>(Vec3{-1.5, 0.5, -1}, 0.25, mats[2]));
+    world.add(std::make_shared<Sphere>(Vec3{1, 0.25, -1.5}, 0.25, mats[1]));
+    world.add(std::make_shared<Sphere>(Vec3{0.5, 0.25, -0.5}, 0.25, mats[3]));
+    world.add(std::make_shared<Sphere>(Point3(0, -100, -1), 100, mats[0]));
 
+    add_cubes(world);
     std::chrono::time_point<std::chrono::system_clock> start =
         std::chrono::system_clock::now();
 
     std::vector<char> buffer;
     buffer.resize(image_height * image_width * 3);
 
-    for (int frame = 0; frame < 32; frame++) {
+    for (int frame = 0; frame < 1; frame++) {
         std::cerr << "\rframe " << frame << "  ";
         Camera camera(16, 9, degrees_to_radians(90),
-                      {Vec3{sin(pi * 0.125 * frame) * 3, 0,
-                            cos(pi * 0.125 * frame) * 3 - 1},
-                       Vec3{0, 0, -1}, Vec3{0, 1, 0}});
+                      {Vec3{0, 0.5, 0}, Vec3{0, 0, -1}, Vec3{0, 1, 0}},
+                      degrees_to_radians(0.5), 0.5);
 #pragma omp parallel for
-        for (int j = image_height - 1; j >= 0; --j) { /*
-            std::cerr << "\rremaining " << j << " " << std::setprecision(2)
+        for (int j = image_height - 1; j >= 0; --j) {
+            /*   std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                       << ((100 * j) / (image_height - 1)) << "%    "
                       << std::flush;*/
             for (int i = 0; i < image_width; ++i) {
