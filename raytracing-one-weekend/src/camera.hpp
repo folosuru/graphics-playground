@@ -2,6 +2,7 @@
 #define INCLUDE_SRC_CAMERA_HPP_
 
 #include <cmath>
+#include <iostream>
 
 #include "ray.hpp"
 #include "vec3.hpp"
@@ -22,15 +23,17 @@ public:
 
         auto viewport_height = 2 * h;
         auto viewport_width = aspect_ratio * viewport_height;
+        auto focal_len = (pos.lookfrom - pos.lookat).length();
 
         auto w = unit_vector(pos.lookfrom - pos.lookat);
         auto u = unit_vector(cross(pos.vup, w));
         auto v = cross(w, u);
 
         origin = pos.lookfrom;
-        horizontal = viewport_height * u;
+        horizontal = viewport_width * u;
         vertical = viewport_height * v;
-        lower_left_corner = origin - horizontal / 2 - vertical / 2 - w;
+        lower_left_corner =
+            origin - horizontal / 2 - vertical / 2 - (w * focal_len);
     }
 
     ray get_ray(double u, double v) const {

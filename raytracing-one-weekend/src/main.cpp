@@ -73,15 +73,20 @@ int main(int argc, char *argv[]) {
     std::chrono::time_point<std::chrono::system_clock> start =
         std::chrono::system_clock::now();
 
+    std::vector<char> buffer;
+    buffer.resize(image_height * image_width * 3);
+
     for (int frame = 0; frame < 32; frame++) {
-        Camera camera(
-            16, 9, degrees_to_radians(90),
-            {Vec3{sin(pi * 0.125 * frame) * 3, 1, cos(pi * 0.125 * frame) * 3},
-             Vec3{0, 0, 0}, Vec3{0, 1, 0}});
-        for (int j = image_height - 1; j >= 0; --j) {
+        std::cerr << "\rframe " << frame << "  ";
+        Camera camera(16, 9, degrees_to_radians(90),
+                      {Vec3{sin(pi * 0.125 * frame) * 3, 0,
+                            cos(pi * 0.125 * frame) * 3 - 1},
+                       Vec3{0, 0, -1}, Vec3{0, 1, 0}});
+#pragma omp parallel for
+        for (int j = image_height - 1; j >= 0; --j) { /*
             std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                       << ((100 * j) / (image_height - 1)) << "%    "
-                      << std::flush;
+                      << std::flush;*/
             for (int i = 0; i < image_width; ++i) {
                 Color pixel_color{0, 0, 0};
                 for (int k = 0; k < samples_per_pixel; k++) {
@@ -89,9 +94,13 @@ int main(int argc, char *argv[]) {
                     auto v = (j + random_double()) / (image_height - 1);
                     pixel_color += ray_color(camera.get_ray(u, v), world);
                 }
-                write_color(std::cout, pixel_color, samples_per_pixel);
+                write_colorbuf(
+                    buffer.data() +
+                        ((image_height - j - 1) * image_width + i) * 3,
+                    pixel_color, samples_per_pixel);
             }
         }
+        std::cout.write(buffer.data(), image_height * image_width * 3);
     }
     std::chrono::time_point<std::chrono::system_clock> stop =
         std::chrono::system_clock::now();
