@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "hittable.hpp"
+#include "math_util.hpp"
 
 class Hittables : public Hittable {
 public:
@@ -13,12 +14,12 @@ public:
         objects.emplace_back(std::move(o));
     }
 
-    virtual bool hit(const ray& r, double tmin, double tmax,
+    virtual bool hit(const ray& r, RealType tmin, RealType tmax,
                      HitRecord& rec) const override;
 
     std::vector<std::shared_ptr<Hittable>> objects;
 };
-bool Hittables::hit(const ray& r, double tmin, double tmax,
+bool Hittables::hit(const ray& r, RealType tmin, RealType tmax,
                     HitRecord& rec) const {
     HitRecord tmp;
     bool hitted = false;

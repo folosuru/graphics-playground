@@ -16,9 +16,9 @@ struct CameraPos {
 class Camera {
 public:
     // fov is radian
-    Camera(int aspect_ratio_x, int aspect_ratio_y, double fov, CameraPos pos_)
+    Camera(int aspect_ratio_x, int aspect_ratio_y, RealType fov, CameraPos pos_)
         : pos(pos_) {
-        const auto aspect_ratio = (double)aspect_ratio_x / aspect_ratio_y;
+        const auto aspect_ratio = (RealType)aspect_ratio_x / aspect_ratio_y;
         auto h = std::tan(fov / 2);
 
         auto viewport_height = 2 * h;
@@ -36,7 +36,7 @@ public:
             origin - horizontal / 2 - vertical / 2 - (w * focal_len);
     }
 
-    ray get_ray(double u, double v) const {
+    ray get_ray(RealType u, double v) const {
         return ray(origin,
                    lower_left_corner + u * horizontal + v * vertical - origin);
     }

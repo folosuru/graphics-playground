@@ -2,6 +2,7 @@
 #define HITTABLE_HPP_
 #include <memory>
 
+#include "math_util.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
 
@@ -10,7 +11,7 @@ struct HitRecord {
     Point3 p;
     Vec3 normal;
     material *material_;
-    double t;
+    RealType t;
     bool front_face;
 
     inline void set_face_normal(const ray& r, const Vec3& outward_normal) {
@@ -22,7 +23,7 @@ struct HitRecord {
 class Hittable {
 public:
     virtual ~Hittable() = default;
-    virtual bool hit(const ray& r, double t_min, double t_max,
+    virtual bool hit(const ray& r, RealType t_min, RealType t_max,
                      HitRecord& rec) const = 0;
 };
 

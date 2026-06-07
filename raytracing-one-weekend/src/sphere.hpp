@@ -4,23 +4,25 @@
 #include <memory>
 
 #include "hittable.hpp"
+#include "vec3.hpp"
 
 class Sphere : public Hittable {
 public:
     Sphere() {}
-    Sphere(Point3 cen, double r, std::shared_ptr<material> m)
+    Sphere(Point3 cen, RealType r, std::shared_ptr<material> m)
         : center(cen), radius(r), material_(m) {}
 
-    bool hit(const ray& r, double tmin, double tmax,
+    bool hit(const ray& r, RealType tmin, RealType tmax,
              HitRecord& rec) const override;
 
 public:
     Point3 center;
-    double radius;
+    RealType radius;
     std::shared_ptr<material> material_;
 };
 
-bool Sphere::hit(const ray& r, double tmin, double tmax, HitRecord& rec) const {
+bool Sphere::hit(const ray& r, RealType tmin, RealType tmax,
+                 HitRecord& rec) const {
     // 式は
     // b^2 * t^w + 2b * (A-C) * t  + (A-C) * (A-C) - r^2
     // = A-C

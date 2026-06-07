@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ostream>
 
+#include "math_util.hpp"
 #include "vec3.hpp"
 
 void write_color(std::ostream& os, Color c) {
@@ -12,8 +13,11 @@ void write_color(std::ostream& os, Color c) {
        << static_cast<char>(255.999 * c.z());
 }
 
+inline RealType clamp(RealType v1, RealType v2, RealType v3) {
+    return std::clamp(v1, v2, v3);
+}
+
 void write_color(std::ostream& os, Color c, int samples) {
-    using std::clamp;
     c /= samples;
 
     os << static_cast<char>(255.999 * clamp(sqrt(c.x()), 0.0, 0.999))
@@ -22,7 +26,6 @@ void write_color(std::ostream& os, Color c, int samples) {
 }
 
 void write_colorbuf(char *pos, Color c, int samples) {
-    using std::clamp;
     c /= samples;
 
     pos[0] = static_cast<char>(255.999 * clamp(sqrt(c.x()), 0.0, 0.999));
