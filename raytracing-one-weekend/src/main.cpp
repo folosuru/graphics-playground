@@ -1,9 +1,11 @@
 #include <chrono>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <ostream>
 #include <thread>
+#include <vector>
 
 #include "camera.hpp"
 #include "color.hpp"
@@ -68,21 +70,27 @@ int main(int argc, char *argv[]) {
     world.add(std::make_shared<Sphere>(Vec3{0.25, -0.25, -1}, 0.25, mats[5]));
     world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100, mats[2]));
 
-    Camera camera(16, 9);
-
     std::chrono::time_point<std::chrono::system_clock> start =
         std::chrono::system_clock::now();
 
-    for (int j = image_height - 1; j >= 0; --j) {
-        std::cerr << "\rremaining " << j << " " << std::flush;
-        for (int i = 0; i < image_width; ++i) {
-            Color pixel_color{0, 0, 0};
-            for (int k = 0; k < samples_per_pixel; k++) {
-                auto u = (i + random_double()) / (image_width - 1);
-                auto v = (j + random_double()) / (image_height - 1);
-                pixel_color += ray_color(camera.get_ray(u, v), world);
+    for (int frame = 0; frame < 32; frame++) {
+        Camera camera(
+            16, 9, degrees_to_radians(90),
+            {Vec3{sin(pi * 0.125 * frame) * 3, 1, cos(pi * 0.125 * frame) * 3},
+             Vec3{0, 0, 0}, Vec3{0, 1, 0}});
+        for (int j = image_height - 1; j >= 0; --j) {
+            std::cerr << "\rremaining " << j << " " << std::setprecision(2)
+                      << ((100 * j) / (image_height - 1)) << "%    "
+                      << std::flush;
+            for (int i = 0; i < image_width; ++i) {
+                Color pixel_color{0, 0, 0};
+                for (int k = 0; k < samples_per_pixel; k++) {
+                    auto u = (i + random_double()) / (image_width - 1);
+                    auto v = (j + random_double()) / (image_height - 1);
+                    pixel_color += ray_color(camera.get_ray(u, v), world);
+                }
+                write_color(std::cout, pixel_color, samples_per_pixel);
             }
-            write_color(std::cout, pixel_color, samples_per_pixel);
         }
     }
     std::chrono::time_point<std::chrono::system_clock> stop =
