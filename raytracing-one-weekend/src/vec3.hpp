@@ -1,6 +1,8 @@
 #ifndef VEC3_HPP
 #define VEC3_HPP
 
+#include <immintrin.h>
+
 #include <cmath>
 #include <ostream>
 
@@ -9,10 +11,16 @@ using std::cos;
 using std::sin;
 using std::sqrt;
 using std::tan;
-struct Vec3 {
-    RealType e[3];
+struct alignas(16) Vec3 {
+    union {
+        RealType e[4];
+        __m128 v;
+    };
     Vec3() : e{0, 0, 0} {}
     Vec3(RealType e0, RealType e1, RealType e2) : e{e0, e1, e2} {}
+    Vec3(RealType e0, RealType e1, RealType e2, RealType e3)
+        : e{e0, e1, e2, e3} {}
+    Vec3(__m128 v_) : v(v_) {}
 
     template<typename T, typename U, typename V>
     explicit Vec3(T e0, U e1, V e2)
@@ -23,7 +31,7 @@ struct Vec3 {
     auto y() const { return e[1]; }
     auto z() const { return e[2]; }
 
-    Vec3 operator-() const { return Vec3(-e[0], -e[1], -e[2]); }
+    Vec3 operator-() const { return Vec3(-e[0], -e[1], -e[2], -e[3]); }
     RealType operator[](int i) const { return e[i]; }
     RealType& operator[](int i) { return e[i]; }
 
@@ -31,6 +39,7 @@ struct Vec3 {
         e[0] += v.e[0];
         e[1] += v.e[1];
         e[2] += v.e[2];
+        e[3] += v.e[3];
         return *this;
     }
 
@@ -38,6 +47,7 @@ struct Vec3 {
         e[0] *= t;
         e[1] *= t;
         e[2] *= t;
+        e[3] *= t;
         return *this;
     }
 
@@ -64,19 +74,22 @@ inline std::ostream& operator<<(std::ostream& out, const Vec3& v) {
 }
 
 inline Vec3 operator+(const Vec3& u, const Vec3& v) {
-    return Vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+    return Vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2],
+                u.e[3] + v.e[3]);
 }
 
 inline Vec3 operator-(const Vec3& u, const Vec3& v) {
-    return Vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
+    return Vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2],
+                u.e[3] - v.e[3]);
 }
 
 inline Vec3 operator*(const Vec3& u, const Vec3& v) {
-    return Vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
+    return Vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2],
+                u.e[3] * v.e[3]);
 }
 
 inline Vec3 operator*(RealType t, const Vec3& v) {
-    return Vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
+    return Vec3(t * v.e[0], t * v.e[1], t * v.e[2], t * v.e[3]);
 }
 
 inline Vec3 operator*(const Vec3& v, RealType t) {
@@ -90,18 +103,26 @@ inline Vec3 operator/(Vec3 v, RealType t) {
 // 内積。
 // a・b。
 inline RealType dot(const Vec3& u, const Vec3& v) {
+    return _mm_cvtss_f32(_mm_dp_ps(u.v, v.v, 0b01111111));
     return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
 
 // 外積。 cross productって言うらしい。
 // a × b。
 inline Vec3 cross(const Vec3& u, const Vec3& v) {
+    __m128 a_1203 = _mm_shuffle_ps(u.v, u.v, _MM_SHUFFLE(3, 0, 2, 1));
+    __m128 b_2013 = _mm_shuffle_ps(v.v, v.v, _MM_SHUFFLE(3, 1, 0, 2));
+    __m128 a_2013 = _mm_shuffle_ps(u.v, u.v, _MM_SHUFFLE(3, 1, 0, 2));
+    __m128 b_1203 = _mm_shuffle_ps(v.v, v.v, _MM_SHUFFLE(3, 0, 2, 1));
+    return {_mm_sub_ps(_mm_mul_ps(a_1203, b_2013), _mm_mul_ps(a_2013, b_1203))};
+
     return Vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
                 u.e[2] * v.e[0] - u.e[0] * v.e[2],
                 u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
 inline Vec3 unit_vector(Vec3 v) {
+    return {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0b01111111)))};
     return v / v.length();
 }
 

@@ -15,7 +15,7 @@ inline RealType degrees_to_radians(double degrees) {
 }
 
 inline float fast_rand_float() {
-    static uint32_t x = 2463534242;
+    thread_local uint32_t x = 2463534242;
     x ^= x << 13;
     x ^= x >> 17;
     x ^= x << 5;

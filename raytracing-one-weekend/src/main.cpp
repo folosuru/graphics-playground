@@ -21,7 +21,6 @@ using std::sqrt;
 
 Color ray_color(const ray& r, const Hittable& hittable, int depth = 10) {
     HitRecord rec;
-    Vec3 sphere_center{0, 0, -1};
     if (depth <= 0) {
         return Color{0, 0, 0};
     }
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]) {
     constexpr auto aspect_ratio = 16.0 / 9.0;
     constexpr int image_width = 640;
     constexpr int image_height = image_width / aspect_ratio;
-    constexpr int samples_per_pixel = 500;
+    constexpr int samples_per_pixel = 30;
     std::cerr << "image size: " << image_width << 'x' << image_height << "\n";
 
     auto viewport_height = 2.0;
@@ -96,7 +95,7 @@ int main(int argc, char *argv[]) {
         Camera camera(16, 9, degrees_to_radians(90),
                       {Vec3{0, 0.5, 0}, Vec3{0, 0, -1}, Vec3{0, 1, 0}},
                       degrees_to_radians(0.5), 0.5);
-#pragma omp parallel for
+        //#pragma omp parallel for
         for (int j = image_height - 1; j >= 0; --j) {
             /*   std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                       << ((100 * j) / (image_height - 1)) << "%    "
