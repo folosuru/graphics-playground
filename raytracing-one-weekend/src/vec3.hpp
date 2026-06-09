@@ -2,6 +2,7 @@
 #define VEC3_HPP
 
 #include <immintrin.h>
+#include <xmmintrin.h>
 
 #include <cmath>
 #include <ostream>
@@ -56,6 +57,7 @@ struct alignas(16) Vec3 {
     RealType length() const { return sqrt(length_squared()); }
 
     RealType length_squared() const {
+        return _mm_cvtss_f32(_mm_dp_ps(v, v, 0x77));
         return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
     inline static Vec3 random() {
@@ -96,14 +98,14 @@ inline Vec3 operator*(const Vec3& v, RealType t) {
     return t * v;
 }
 
-inline Vec3 operator/(Vec3 v, RealType t) {
+inline Vec3 operator/(const Vec3& v, RealType t) {
     return (1 / t) * v;
 }
 
 // 内積。
 // a・b。
 inline RealType dot(const Vec3& u, const Vec3& v) {
-    return _mm_cvtss_f32(_mm_dp_ps(u.v, v.v, 0b01111111));
+    return _mm_cvtss_f32(_mm_dp_ps(u.v, v.v, 0x77));
     return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
 
@@ -121,8 +123,10 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
                 u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
-inline Vec3 unit_vector(Vec3 v) {
-    return {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0b01111111)))};
+inline Vec3 unit_vector(const Vec3& v) {
+    // これを有効化すると黒いゴマが出現する。_mm_rsqrt_psの精度の問題？
+    // 謎。後で調べるかも。
+    // return {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0x77)))};
     return v / v.length();
 }
 
