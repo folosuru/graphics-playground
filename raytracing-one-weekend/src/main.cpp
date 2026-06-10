@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     std::chrono::time_point<std::chrono::system_clock> start =
         std::chrono::system_clock::now();
 
-    std::vector<char> buffer;
+    std::vector<unsigned char> buffer;
     buffer.resize(image_height * image_width * 3);
 
     for (int frame = 0; frame < 1; frame++) {
@@ -113,7 +113,8 @@ int main(int argc, char *argv[]) {
                     pixel_color, samples_per_pixel);
             }
         }
-        std::cout.write(buffer.data(), image_height * image_width * 3);
+        std::cout.write(reinterpret_cast<const char *>(buffer.data()),
+                        image_height * image_width * 3);
     }
     std::chrono::time_point<std::chrono::system_clock> stop =
         std::chrono::system_clock::now();
