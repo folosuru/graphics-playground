@@ -1,6 +1,7 @@
 #ifndef COLOR_HPP_
 #define COLOR_HPP_
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <ostream>
 

@@ -5,6 +5,8 @@
 #include <xmmintrin.h>
 
 #include <cmath>
+#include <csignal>
+#include <iostream>
 #include <ostream>
 
 #include "math_util.hpp"
@@ -126,7 +128,12 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
 inline Vec3 unit_vector(const Vec3& v) {
     // これを有効化すると黒いゴマが出現する。_mm_rsqrt_psの精度の問題？
     // 謎。後で調べるかも。
-    // return {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0x77)))};
+    Vec3 result = {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0x77)))};
+    if (std::isnan(result.x())) {
+        std::cerr << "NaN at unit vector!\nvalue: " << v << "\n";
+        //raise(SIGTRAP);
+    }
+    return result;
     return v / v.length();
 }
 
@@ -150,8 +157,10 @@ inline Vec3 reflect(const Vec3& v, const Vec3& n) {
 inline Vec3 refract(const Vec3& uv, const Vec3& n, RealType etai_over_etat) {
     auto cos_theta = dot(-uv, n);
     Vec3 r_out_parallel = etai_over_etat * (uv + cos_theta * n);
-    Vec3 r_out_perp = -sqrt(1.0 - r_out_parallel.length_squared()) * n;
-    return r_out_parallel + r_out_perp;
+    Vec3 r_out_perp =
+        -sqrt(std::fabs(1.0 - r_out_parallel.length_squared())) * n;
+    Vec3 r = r_out_parallel + r_out_perp;
+    return r;
 }
 
 #endif  // VEC3_HPP

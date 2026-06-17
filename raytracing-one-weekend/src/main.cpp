@@ -63,9 +63,9 @@ void add_cubes(Hittables& world) {
 
 int main(int argc, char *argv[]) {
     constexpr auto aspect_ratio = 16.0 / 9.0;
-    constexpr int image_width = 640;
+    constexpr int image_width = 320;
     constexpr int image_height = image_width / aspect_ratio;
-    constexpr int samples_per_pixel = 30;
+    constexpr int samples_per_pixel = 50;
     std::cerr << "image size: " << image_width << 'x' << image_height << "\n";
 
     auto viewport_height = 2.0;
@@ -97,9 +97,9 @@ int main(int argc, char *argv[]) {
                       degrees_to_radians(0.5), 0.5);
         //#pragma omp parallel for
         for (int j = image_height - 1; j >= 0; --j) {
-            /*   std::cerr << "\rremaining " << j << " " << std::setprecision(2)
+            std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                       << ((100 * j) / (image_height - 1)) << "%    "
-                      << std::flush;*/
+                      << std::flush;
             for (int i = 0; i < image_width; ++i) {
                 Color pixel_color{0, 0, 0};
                 for (int k = 0; k < samples_per_pixel; k++) {
