@@ -19,8 +19,8 @@ public:
 
     std::vector<std::shared_ptr<Hittable>> objects;
 };
-bool Hittables::hit(const ray& r, RealType tmin, RealType tmax,
-                    HitRecord& rec) const {
+inline bool Hittables::hit(const ray& r, RealType tmin, RealType tmax,
+                           HitRecord& rec) const {
     HitRecord tmp;
     bool hitted = false;
     auto closet_so_far = tmax;

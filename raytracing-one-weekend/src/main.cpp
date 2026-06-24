@@ -4,7 +4,6 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
-#include <thread>
 #include <vector>
 
 #include "camera.hpp"
@@ -16,8 +15,6 @@
 #include "ray.hpp"
 #include "sphere.hpp"
 #include "vec3.hpp"
-
-using std::sqrt;
 
 Color ray_color(const ray& r, const Hittable& hittable, int depth = 10) {
     HitRecord rec;
@@ -32,9 +29,6 @@ Color ray_color(const ray& r, const Hittable& hittable, int depth = 10) {
         } else {
             return Color{0, 0, 0};  // コレは何？
         }
-        //       ray new_ray{rec.p, rec.p + rec.normal + random_unit_sphere_vector()};
-        //       return 0.5 * ray_color(new_ray, hittable, depth - 1);
-        //       return 0.5 * (rec.normal + Vec3(1, 1, 1));
     }
     Vec3 unit_direction = unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);

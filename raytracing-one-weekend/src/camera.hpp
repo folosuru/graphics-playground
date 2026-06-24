@@ -2,7 +2,6 @@
 #define INCLUDE_SRC_CAMERA_HPP_
 
 #include <cmath>
-#include <iostream>
 
 #include "math_util.hpp"
 #include "ray.hpp"

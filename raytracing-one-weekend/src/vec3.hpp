@@ -126,14 +126,8 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
 }
 
 inline Vec3 unit_vector(const Vec3& v) {
-    // これを有効化すると黒いゴマが出現する。_mm_rsqrt_psの精度の問題？
-    // 謎。後で調べるかも。
-    Vec3 result = {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0x77)))};
-    if (std::isnan(result.x())) {
-        std::cerr << "NaN at unit vector!\nvalue: " << v << "\n";
-        //raise(SIGTRAP);
-    }
-    return result;
+    return {_mm_mul_ps(v.v, _mm_rsqrt_ps(_mm_dp_ps(v.v, v.v, 0x77)))};
+
     return v / v.length();
 }
 

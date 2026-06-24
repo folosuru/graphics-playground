@@ -8,7 +8,7 @@
 #include "math_util.hpp"
 #include "vec3.hpp"
 
-void write_color(std::ostream& os, Color c) {
+inline void write_color(std::ostream& os, Color c) {
     os << static_cast<char>(255.999 * c.x())
        << static_cast<char>(255.999 * c.y())
        << static_cast<char>(255.999 * c.z());
@@ -18,7 +18,7 @@ inline RealType clamp(RealType v1, RealType v2, RealType v3) {
     return std::clamp(v1, v2, v3);
 }
 
-void write_color(std::ostream& os, Color c, int samples) {
+inline void write_color(std::ostream& os, Color c, int samples) {
     c /= samples;
 
     os << static_cast<char>(255.999 * clamp(sqrt(c.x()), 0.0, 0.999))
@@ -26,7 +26,7 @@ void write_color(std::ostream& os, Color c, int samples) {
        << static_cast<char>(255.999 * clamp(sqrt(c.z()), 0.0, 0.999));
 }
 
-void write_colorbuf(unsigned char *pos, Color c, int samples) {
+inline void write_colorbuf(unsigned char *pos, Color c, int samples) {
     c /= samples;
 
     pos[0] =

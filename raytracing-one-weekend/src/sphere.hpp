@@ -21,8 +21,8 @@ public:
     std::shared_ptr<material> material_;
 };
 
-bool Sphere::hit(const ray& r, RealType tmin, RealType tmax,
-                 HitRecord& rec) const {
+inline bool Sphere::hit(const ray& r, RealType tmin, RealType tmax,
+                        HitRecord& rec) const {
     // 式は
     // b^2 * t^w + 2b * (A-C) * t  + (A-C) * (A-C) - r^2
     // = A-C

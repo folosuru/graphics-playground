@@ -1,7 +1,5 @@
 #ifndef HITTABLE_HPP_
 #define HITTABLE_HPP_
-#include <memory>
-
 #include "math_util.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
