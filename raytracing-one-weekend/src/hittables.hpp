@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "aabb.hpp"
 #include "hittable.hpp"
 #include "math_util.hpp"
 
@@ -11,14 +12,19 @@ public:
     Hittables() {}
 
     void add(std::shared_ptr<Hittable> o) {
+        bbox = aabb(bbox, o->bounding_box());
         objects.emplace_back(std::move(o));
     }
 
-    virtual bool hit(const ray& r, RealType tmin, RealType tmax,
-                     HitRecord& rec) const override;
+    bool hit(const ray& r, RealType tmin, RealType tmax,
+             HitRecord& rec) const override;
+
+    aabb bounding_box() const override { return bbox; }
 
     std::vector<std::shared_ptr<Hittable>> objects;
+    aabb bbox;
 };
+
 inline bool Hittables::hit(const ray& r, RealType tmin, RealType tmax,
                            HitRecord& rec) const {
     HitRecord tmp;

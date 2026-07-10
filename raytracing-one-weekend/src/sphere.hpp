@@ -15,6 +15,8 @@ public:
     bool hit(const ray& r, RealType tmin, RealType tmax,
              HitRecord& rec) const override;
 
+    aabb bounding_box() const override;
+
 public:
     Point3 center;
     RealType radius;
@@ -55,6 +57,11 @@ inline bool Sphere::hit(const ray& r, RealType tmin, RealType tmax,
         }
     }
     return false;
+}
+
+inline aabb Sphere::bounding_box() const {
+    Vec3 rad = {radius, radius, radius};
+    return aabb(center + rad, center - rad);
 }
 
 #endif  // INCLUDE_SRC_SPHERE_HPP_

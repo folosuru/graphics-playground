@@ -60,8 +60,26 @@ struct alignas(16) Vec3 {
 
     RealType length_squared() const {
         return _mm_cvtss_f32(_mm_dp_ps(v, v, 0x77));
-        return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
+        // return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
     }
+
+    Vec3 rcp() const {
+        return _mm_rcp_ps(v);
+        // return {1 / e[0], 1 / e[1], 1 / e[2]};
+    }
+
+    /**
+     * 2 つのベクトルから小さい方の値を取る。
+     * なお、一方にNaN がある時はNaN でない側が取られる。
+     **/
+    Vec3 extract_min(const Vec3& other) const { return _mm_min_ps(v, other.v); }
+
+    /**
+     * 2 つのベクトルから大きい方の値を取る。
+     * なお、一方にNaN がある時はNaN でない側が取られる。
+     **/
+    Vec3 extract_max(const Vec3& other) const { return _mm_max_ps(v, other.v); }
+
     inline static Vec3 random() {
         return {random_double(), random_double(), random_double()};
     }
