@@ -7,9 +7,16 @@
 #include "hittable.hpp"
 #include "math_util.hpp"
 
+using HittablesRecord = std::vector<std::shared_ptr<Hittable>>;
+
 class Hittables : public Hittable {
 public:
     Hittables() {}
+    Hittables(std::vector<std::shared_ptr<Hittable>>&& vec) : objects(vec) {
+        for (const auto& i : objects) {
+            bbox = aabb(bbox, i->bounding_box());
+        }
+    }
 
     void add(std::shared_ptr<Hittable> o) {
         bbox = aabb(bbox, o->bounding_box());
@@ -21,7 +28,7 @@ public:
 
     aabb bounding_box() const override { return bbox; }
 
-    std::vector<std::shared_ptr<Hittable>> objects;
+    HittablesRecord objects;
     aabb bbox;
 };
 

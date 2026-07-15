@@ -1,5 +1,7 @@
 #ifndef INCLUDE_SRC_AABB_HPP_
 #define INCLUDE_SRC_AABB_HPP_
+#include <cstddef>
+
 #include "math_util.hpp"
 #include "range.hpp"
 #include "ray.hpp"
@@ -7,7 +9,7 @@
 
 class aabb {
 public:
-    bool contains(const ray& ray, range ray_t_range) {
+    bool contains(const ray& ray, range ray_t_range) const {
         range current_t_range = ray_t_range;
 
         // x = ray.origin() + ray.direction() * t;
@@ -43,11 +45,29 @@ public:
 
     aabb(const aabb& v1, const aabb& v2)
         : start(v1.start.extract_min(v2.start)),
-          end(v1.end.extract_max(v2.start)) {}
+          end(v1.end.extract_max(v2.end)) {}
 
     aabb()
         : start(Infinity, Infinity, Infinity),
           end(-Infinity, -Infinity, -Infinity) {}
+
+    template<size_t index>
+    static bool compare_min(const aabb& l, const aabb& r) {
+        return l.start[index] < r.start[index];
+    }
+
+    static auto compare_min(int axis) {
+        switch (axis) {
+            case 0:
+                return compare_min<0>;
+            case 1:
+                return compare_min<1>;
+            case 2:
+                return compare_min<2>;
+            default:
+                return compare_min<0>;
+        }
+    }
 
 private:
     Vec3 start, end;
