@@ -38,8 +38,11 @@ public:
         if (size <= 2) {
             return std::make_unique<Hittables>(HittablesRecord(begin, end));
         }
-        int axis = 3;
-        auto comp = aabb::compare_min(axis);
+        aabb all;
+        for (auto iter = begin; iter != end; iter++) {
+            all = aabb(all, (*iter)->bounding_box());
+        }
+        auto comp = aabb::compare_min(0);  //random_double() * 3);
         std::sort(begin, end, [&comp](auto l, auto r) {
             return comp((*l).bounding_box(), (*r).bounding_box());
         });

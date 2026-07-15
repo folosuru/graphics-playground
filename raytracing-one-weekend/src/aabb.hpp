@@ -69,6 +69,14 @@ public:
         }
     }
 
+    int longest_axis() const {
+        Vec3 length = end - start;
+        if (length.x() < length.y())
+            return length.y() > length.z() ? 1 : 2;
+        else
+            return length.x() > length.z() ? 0 : 2;
+    }
+
 private:
     Vec3 start, end;
 };
