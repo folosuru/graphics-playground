@@ -1,5 +1,6 @@
 #ifndef HITTABLE_HPP_
 #define HITTABLE_HPP_
+#include "aabb.hpp"
 #include "math_util.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
@@ -23,6 +24,8 @@ public:
     virtual ~Hittable() = default;
     virtual bool hit(const ray& r, RealType t_min, RealType t_max,
                      HitRecord& rec) const = 0;
+
+    virtual aabb bounding_box() const = 0;
 };
 
 #endif  // HITTABLE_HPP_

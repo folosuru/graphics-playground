@@ -6,6 +6,7 @@
 #include <ostream>
 #include <vector>
 
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "color.hpp"
 #include "hittable.hpp"
@@ -35,7 +36,7 @@ Color ray_color(const ray& r, const Hittable& hittable, int depth = 10) {
     return (1.0 - t) * Color(1.0, 1.0, 1.0) + t * Color(0.5, 0.7, 1.0);
 }
 
-void add_cubes(Hittables& world) {
+void add_cubes(HittablesRecord& world) {
     std::shared_ptr<material> mats[] = {
         std::make_shared<lambertian>(Color{0.9, 0.3, 0.3}),
         std::make_shared<lambertian>(Color{0.3, 0.7, 0.9}),
@@ -50,7 +51,7 @@ void add_cubes(Hittables& world) {
 
     for (int i = 0; i < 128; i++) {
         Vec3 pos{random_double(-3, 3), 0.1, random_double(-5, 1)};
-        world.add(std::make_shared<Sphere>(
+        world.push_back(std::make_shared<Sphere>(
             pos, 0.1, mats[rand() % (sizeof(mats) / sizeof(mats[0]))]));
     }
 }
@@ -65,19 +66,25 @@ int main(int argc, char *argv[]) {
     auto viewport_height = 2.0;
     auto viewport_width = aspect_ratio * viewport_height;
     auto focal_length = 1.0;
-    Hittables world;
+    HittablesRecord objs;
 
     std::shared_ptr<material> mats[] = {
         std::make_shared<lambertian>(Color{0.7, 0.7, 0.7}),
         std::make_shared<lambertian>(Color{0.7, 0.2, 0.3}),
         std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
         std::make_shared<dielectric>(1.5)};
-    world.add(std::make_shared<Sphere>(Vec3{-1.5, 0.5, -1}, 0.25, mats[2]));
-    world.add(std::make_shared<Sphere>(Vec3{1, 0.25, -1.5}, 0.25, mats[1]));
-    world.add(std::make_shared<Sphere>(Vec3{0.5, 0.25, -0.5}, 0.25, mats[3]));
-    world.add(std::make_shared<Sphere>(Point3(0, -100, -1), 100, mats[0]));
 
-    add_cubes(world);
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{-1.5, 0.5, -1}, 0.25, mats[2]));
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{1, 0.25, -1.5}, 0.25, mats[1]));
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{0.5, 0.25, -0.5}, 0.25, mats[3]));
+    objs.push_back(std::make_shared<Sphere>(Point3(0, -100, -1), 100, mats[0]));
+    add_cubes(objs);
+
+    auto world = bvh_node::create(objs.begin(), objs.end());
+
     std::chrono::time_point<std::chrono::system_clock> start =
         std::chrono::system_clock::now();
 
@@ -99,7 +106,7 @@ int main(int argc, char *argv[]) {
                 for (int k = 0; k < samples_per_pixel; k++) {
                     auto u = (i + random_double()) / (image_width - 1);
                     auto v = (j + random_double()) / (image_height - 1);
-                    pixel_color += ray_color(camera.get_ray(u, v), world);
+                    pixel_color += ray_color(camera.get_ray(u, v), *world);
                 }
                 write_colorbuf(
                     buffer.data() +
