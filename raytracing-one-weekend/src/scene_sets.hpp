@@ -1,0 +1,50 @@
+#include "camera.hpp"
+#include "hittables.hpp"
+#include "material.hpp"
+#include "rendrer.hpp"
+#include "sphere.hpp"
+
+void scene1() {
+    HittablesRecord objs;
+
+    std::shared_ptr<material> mats[] = {
+        std::make_shared<lambertian>(Color{0.7, 0.7, 0.7}),
+        std::make_shared<lambertian>(Color{0.7, 0.2, 0.3}),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
+        std::make_shared<dielectric>(1.5)};
+
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{-1.5, 0.5, -1}, 0.25, mats[2]));
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{1, 0.25, -1.5}, 0.25, mats[1]));
+    objs.push_back(
+        std::make_shared<Sphere>(Vec3{0.5, 0.25, -0.5}, 0.25, mats[3]));
+    objs.push_back(std::make_shared<Sphere>(Point3(0, -100, -1), 100, mats[0]));
+
+    std::shared_ptr<material> smallmats[] = {
+        std::make_shared<lambertian>(Color{0.9, 0.3, 0.3}),
+        std::make_shared<lambertian>(Color{0.3, 0.7, 0.9}),
+        std::make_shared<lambertian>(Color{0.1, 0.9, 0.1}),
+        std::make_shared<lambertian>(Color{0.1, 0.5, 0.5}),
+        std::make_shared<lambertian>(Color{0.1, 0.1, 0.2}),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.3}, 0.5),
+        std::make_shared<metal>(Color{0.1, 0.8, 0.3}, 0.5),
+        std::make_shared<dielectric>(1.5),
+    };
+
+    for (int i = 0; i < 128; i++) {
+        Vec3 pos{random_double(-3, 3), 0.1, random_double(-5, 1)};
+        objs.push_back(std::make_shared<Sphere>(
+            pos, 0.1,
+            smallmats[rand() % (sizeof(smallmats) / sizeof(smallmats[0]))]));
+    }
+
+    for (int frame = 0; frame < 1; frame++) {
+        Camera camera(16, 9, degrees_to_radians(90),
+                      {Vec3{0, 0.5, 0}, Vec3{0, 0, -1}, Vec3{0, 1, 0}},
+                      degrees_to_radians(0.5), 0.5);
+
+        Renderer().render(objs, camera);
+    }
+}
