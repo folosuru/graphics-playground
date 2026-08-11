@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <ostream>
 
 #include "bvh.hpp"
 #include "camera.hpp"
@@ -20,6 +21,10 @@ class Renderer {
     static constexpr int samples_per_pixel = 25;
 
 public:
+    struct RenderResult {
+        double take_seconds;
+    };
+
     Renderer() : buffer(image_height * image_width * 3) {
         std::cerr << "image size: " << image_width << 'x' << image_height
                   << "\n";
@@ -35,7 +40,7 @@ public:
         render(world, camera);
     }
 
-    void render(std::unique_ptr<Hittable>& bvh, Camera& camera) {
+    RenderResult render(std::unique_ptr<Hittable>& bvh, Camera& camera) {
         using std::chrono::system_clock;
         using std::chrono::time_point;
 
@@ -61,10 +66,9 @@ public:
                 }
             }
         });
-
-        std::cerr << "\rrender take: " << time << "sec \n";
         std::cout.write(reinterpret_cast<const char *>(buffer.data()),
                         image_height * image_width * 3);
+        return {time.seconds()};
     }
 
     static Color ray_color(const ray& r, const Hittable& hittable,
