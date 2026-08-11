@@ -1,11 +1,14 @@
+#include <iostream>
 #include <memory>
 
 #include "camera.hpp"
 #include "hittables.hpp"
 #include "material.hpp"
 #include "math_util.hpp"
+#include "obj_loader.hpp"
 #include "rendrer.hpp"
 #include "sphere.hpp"
+#include "timer.hpp"
 #include "triangle.hpp"
 
 void scene1() {
@@ -53,9 +56,10 @@ void scene1() {
     }
 }
 
-Vec3 frame_rotation(int total, int current, RealType distance) {
+Vec3 frame_rotation(int total, int current, RealType distance,
+                    RealType y = 1.5) {
     const auto radian = (current * pi * 2) / total;
-    return Vec3{sin(radian) * distance, 0.5, cos(radian) * distance};
+    return Vec3{sin(radian) * distance, y, cos(radian) * distance};
 }
 
 void scene2() {
@@ -78,4 +82,25 @@ void scene2() {
 
         Renderer().render(bvh, camera);
     }
+}
+
+void scene3() {
+    constexpr int frame_count = 1;
+    HittablesRecord objs;
+    load_obj(objs, "models/utah_teapot.obj");
+    std::cerr << "object count = " << objs.size() << ".\n";
+
+    auto r = Renderer();
+    auto bvh = bvh_node::create(objs.begin(), objs.end());
+    auto time = timer([&]() {
+        for (int frame = 0; frame < frame_count; frame++) {
+            Camera camera(16, 9, degrees_to_radians(45),
+                          {frame_rotation(frame_count - 1, frame, 6.0, 3),
+                           Vec3{0, 1, 0}, Vec3{0, 1, 0}},
+                          degrees_to_radians(0.5), 0.5);
+
+            r.render(bvh, camera);
+        }
+    });
+    std::cerr << "total take: " << time << " s\n";
 }

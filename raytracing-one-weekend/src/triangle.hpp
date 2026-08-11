@@ -14,7 +14,7 @@ public:
           u_vec(a_ - b_),
           v_vec(a_ - c_),
           normal(unit_vector(cross(u_vec, v_vec))) {
-        mat = std::make_shared<lambertian>(Color{0.9, 0.3, 0.3});
+        mat = std::make_shared<lambertian>(Color{0.8, 0.8, 0.8});
         box = aabb::from_points({a_, b_, c_});
         box.padding();
     }
