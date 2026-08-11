@@ -42,7 +42,7 @@ public:
         for (auto iter = begin; iter != end; iter++) {
             all = aabb(all, (*iter)->bounding_box());
         }
-        auto comp = aabb::compare_min(0);  //random_double() * 3);
+        auto comp = aabb::compare_min(all.longest_axis());
         std::sort(begin, end, [&comp](auto l, auto r) {
             return comp((*l).bounding_box(), (*r).bounding_box());
         });

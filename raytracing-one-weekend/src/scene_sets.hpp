@@ -1,3 +1,5 @@
+#include <iomanip>
+#include <ios>
 #include <iostream>
 #include <memory>
 
@@ -85,7 +87,7 @@ void scene2() {
 }
 
 void scene3() {
-    constexpr int frame_count = 1;
+    constexpr int frame_count = 30;
     HittablesRecord objs;
     load_obj(objs, "models/utah_teapot.obj");
     std::cerr << "object count = " << objs.size() << ".\n";
@@ -95,12 +97,14 @@ void scene3() {
     auto time = timer([&]() {
         for (int frame = 0; frame < frame_count; frame++) {
             Camera camera(16, 9, degrees_to_radians(45),
-                          {frame_rotation(frame_count - 1, frame, 6.0, 3),
+                          {frame_rotation(frame_count + 1, frame, 6.0, 3),
                            Vec3{0, 1, 0}, Vec3{0, 1, 0}},
                           degrees_to_radians(0.5), 0.5);
 
-            r.render(bvh, camera);
+            auto time = r.render(bvh, camera);
+            std::cerr << "frame " << std::setw(4) << std::right << frame
+                      << ", take " << time.take_seconds << "sec \n";
         }
     });
-    std::cerr << "total take: " << time << " s\n";
+    std::cerr << "total take: " << time << " s       \n";
 }
