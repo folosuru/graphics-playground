@@ -1,6 +1,7 @@
 #ifndef INCLUDE_SRC_AABB_HPP_
 #define INCLUDE_SRC_AABB_HPP_
 #include <cstddef>
+#include <initializer_list>
 
 #include "math_util.hpp"
 #include "range.hpp"
@@ -51,6 +52,22 @@ public:
         : start(Infinity, Infinity, Infinity),
           end(-Infinity, -Infinity, -Infinity) {}
 
+    static aabb everything() {
+        return aabb(Vec3(-Infinity, -Infinity, -Infinity),
+                    Vec3(Infinity, Infinity, Infinity), create_direct{});
+    }
+
+    static aabb from_points(std::initializer_list<Point3> points) {
+        Point3 min = Point3{Infinity, Infinity, Infinity};
+        Point3 max = Point3{-Infinity, -Infinity, -Infinity};
+
+        for (auto i : points) {
+            min = min.extract_min(i);
+            max = max.extract_max(i);
+        }
+        return aabb(min, max);
+    }
+
     template<size_t index>
     static bool compare_min(const aabb& l, const aabb& r) {
         return l.start[index] < r.start[index];
@@ -77,8 +94,20 @@ public:
             return length.x() > length.z() ? 0 : 2;
     }
 
+    void padding() {
+        constexpr float padding_size = 0.0001f;
+        for (int i = 0; i < 3; i++) {
+            if (end[i] - start[i] < padding_size) {
+                end[i] += padding_size;
+                start[i] -= padding_size;
+            }
+        }
+    }
+
 private:
     Vec3 start, end;
+    struct create_direct {};
+    aabb(Vec3 v1, Vec3 v2, create_direct) : start(v1), end(v2) {}
 };
 
 #endif  // INCLUDE_SRC_AABB_HPP_

@@ -175,4 +175,10 @@ inline Vec3 refract(const Vec3& uv, const Vec3& n, RealType etai_over_etat) {
     return r;
 }
 
+inline RealType det(const Vec3& v1, const Vec3& v2, const Vec3& v3) {
+    return v1.x() * (v2.y() * v3.z() - v3.y() * v2.z()) +
+           v1.y() * (v3.x() * v2.z() - v2.x() * v3.z()) +
+           v1.z() * (v3.y() * v2.x() - v2.y() * v3.x());
+}
+
 #endif  // VEC3_HPP

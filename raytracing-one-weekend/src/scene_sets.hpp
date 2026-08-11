@@ -1,8 +1,12 @@
+#include <memory>
+
 #include "camera.hpp"
 #include "hittables.hpp"
 #include "material.hpp"
+#include "math_util.hpp"
 #include "rendrer.hpp"
 #include "sphere.hpp"
+#include "triangle.hpp"
 
 void scene1() {
     HittablesRecord objs;
@@ -46,5 +50,32 @@ void scene1() {
                       degrees_to_radians(0.5), 0.5);
 
         Renderer().render(objs, camera);
+    }
+}
+
+Vec3 frame_rotation(int total, int current, RealType distance) {
+    const auto radian = (current * pi * 2) / total;
+    return Vec3{sin(radian) * distance, 0.5, cos(radian) * distance};
+}
+
+void scene2() {
+    HittablesRecord objs;
+    objs.push_back(std::make_shared<triangle>(
+        Vec3{-1, -0.5, 0}, Vec3{0, -0.5, 0}, Vec3{0, 0.5, 0.2}));
+    std::shared_ptr<material> mats[] = {
+        std::make_shared<lambertian>(Color{0.7, 0.7, 0.7}),
+        std::make_shared<lambertian>(Color{0.7, 0.2, 0.3}),
+        std::make_shared<metal>(Color{0.8, 0.8, 0.8}, 0),
+        std::make_shared<dielectric>(1.5)};
+
+    objs.push_back(std::make_shared<Sphere>(Vec3{-1, -0.5, 0}, 0.05, mats[1]));
+    auto bvh = bvh_node::create(objs.begin(), objs.end());
+    for (int frame = 0; frame < 1; frame++) {
+        Camera camera(
+            16, 9, degrees_to_radians(45),
+            {frame_rotation(89, frame, 2.0), Vec3{0, 0, 0}, Vec3{0, 1, 0}},
+            degrees_to_radians(0.5), 0.5);
+
+        Renderer().render(bvh, camera);
     }
 }
