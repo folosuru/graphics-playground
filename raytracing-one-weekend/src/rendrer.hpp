@@ -40,11 +40,13 @@ public:
         using std::chrono::time_point;
 
         auto time = timer([&, this]() {
+#pragma omp parallel for
             for (int j = image_height - 1; j >= 0; --j) {
+                /*
                 std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                           << ((100 * j) / (image_height - 1)) << "%    "
                           << std::flush;
-
+               */
                 for (int i = 0; i < image_width; ++i) {
                     Color pixel_color{0, 0, 0};
                     for (int k = 0; k < samples_per_pixel; k++) {
