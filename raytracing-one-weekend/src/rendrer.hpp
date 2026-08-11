@@ -17,7 +17,7 @@ class Renderer {
     static constexpr auto aspect_ratio = 16.0 / 9.0;
     static constexpr int image_width = 320;
     static constexpr int image_height = image_width / aspect_ratio;
-    static constexpr int samples_per_pixel = 50;
+    static constexpr int samples_per_pixel = 25;
 
 public:
     Renderer() : buffer(image_height * image_width * 3) {
@@ -46,7 +46,7 @@ public:
                 std::cerr << "\rremaining " << j << " " << std::setprecision(2)
                           << ((100 * j) / (image_height - 1)) << "%    "
                           << std::flush;
-               */
+                */
                 for (int i = 0; i < image_width; ++i) {
                     Color pixel_color{0, 0, 0};
                     for (int k = 0; k < samples_per_pixel; k++) {
@@ -62,8 +62,7 @@ public:
             }
         });
 
-        std::cerr << "\nrender take: " << time << "sec \n";
-
+        std::cerr << "\rrender take: " << time << "sec \n";
         std::cout.write(reinterpret_cast<const char *>(buffer.data()),
                         image_height * image_width * 3);
     }
