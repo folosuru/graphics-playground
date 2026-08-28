@@ -4,6 +4,7 @@
 #include "hittable.hpp"
 #include "math_util.hpp"
 #include "ray.hpp"
+#include "texture.hpp"
 #include "vec3.hpp"
 class material {
 public:
@@ -24,6 +25,36 @@ public:
     }
 
     Color albedo;
+};
+
+class checker : public material {
+public:
+    checker(const Color& a) : albedo(a) {}
+    bool scatter(const ray& r_in, const HitRecord& rec, Color& attenuation,
+                 ray& scattered) const override {
+        Vec3 scatter_direction = rec.normal + random_unit_sphere_vector();
+        scattered = ray(rec.p, scatter_direction);
+        attenuation = tex.get({(floor(rec.p.x() * 10) + floor(rec.p.y() * 10) +
+                                floor(rec.p.z() * 10)),
+                               0});
+        return true;
+    }
+
+    Color albedo;
+    checker_texture tex;
+};
+
+class lambertian_texture : public material {
+public:
+    lambertian_texture(texture *texture) : texture_(texture) {}
+    bool scatter(const ray& r_in, const HitRecord& rec, Color& attenuation,
+                 ray& scattered) const override {
+        Vec3 scatter_direction = rec.normal + random_unit_sphere_vector();
+        scattered = ray(rec.p, scatter_direction);
+        attenuation = texture_->get(rec.texture_uv);
+        return true;
+    }
+    texture *texture_;
 };
 
 class metal : public material {

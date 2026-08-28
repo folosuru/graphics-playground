@@ -3,6 +3,7 @@
 #include "aabb.hpp"
 #include "math_util.hpp"
 #include "ray.hpp"
+#include "vec2.hpp"
 #include "vec3.hpp"
 
 class material;
@@ -11,6 +12,7 @@ struct HitRecord {
     Vec3 normal;
     material *material_;
     RealType t;
+    Vec2 texture_uv;
     bool front_face;
 
     inline void set_face_normal(const ray& r, const Vec3& outward_normal) {

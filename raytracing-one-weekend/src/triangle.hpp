@@ -6,7 +6,9 @@
 #include "aabb.hpp"
 #include "hittable.hpp"
 #include "material.hpp"
+#include "vec2.hpp"
 #include "vec3.hpp"
+
 class triangle : public Hittable {
 public:
     triangle(Point3 a_, Point3 b_, Point3 c_)
@@ -14,6 +16,29 @@ public:
           u_vec(a_ - b_),
           v_vec(a_ - c_),
           normal(unit_vector(cross(u_vec, v_vec))) {
+        mat = std::make_shared<lambertian>(Color{0.8, 0.8, 0.8});
+        box = aabb::from_points({a_, b_, c_});
+        box.padding();
+    }
+
+    triangle(Point3 a_, Point3 b_, Point3 c_, Vec2 a_uv, Vec2 b_uv, Vec2 c_uv,
+             std::shared_ptr<material> mat_)
+        : a(a_),
+          u_vec(a_ - b_),
+          v_vec(a_ - c_),
+          normal(unit_vector(cross(u_vec, v_vec))),
+          uv{a_uv, b_uv, c_uv},
+          mat(mat_) {
+        box = aabb::from_points({a_, b_, c_});
+        box.padding();
+    }
+    triangle(Point3 a_, Point3 b_, Point3 c_, Point3 normal_, Vec2 a_uv,
+             Vec2 b_uv, Vec2 c_uv)
+        : a(a_),
+          u_vec(a_ - b_),
+          v_vec(a_ - c_),
+          normal(normal_),
+          uv{a_uv, b_uv, c_uv} {
         mat = std::make_shared<lambertian>(Color{0.8, 0.8, 0.8});
         box = aabb::from_points({a_, b_, c_});
         box.padding();
@@ -43,15 +68,22 @@ public:
 
         rec.t = t;
         rec.p = r.at(t);
+        rec.texture_uv = get_texture_uv(u, v);
         rec.set_face_normal(r, normal);
         rec.material_ = mat.get();
         return true;
+    }
+
+    Vec2 get_texture_uv(float triangle_u, float triangle_v) const noexcept {
+        auto A_weight = (1 - triangle_u - triangle_v);
+        return uv[0] * A_weight + uv[1] * triangle_u + uv[2] * triangle_v;
     }
 
 private:
     Point3 a;
     Vec3 u_vec, v_vec;
     Vec3 normal;
+    Vec2 uv[3];
     aabb box;
     std::shared_ptr<material> mat;
 };

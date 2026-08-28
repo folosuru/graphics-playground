@@ -10,8 +10,10 @@
 #include "obj_loader.hpp"
 #include "rendrer.hpp"
 #include "sphere.hpp"
+#include "texture.hpp"
 #include "timer.hpp"
 #include "triangle.hpp"
+#include "vec3.hpp"
 
 void scene1() {
     HittablesRecord objs;
@@ -107,4 +109,32 @@ void scene3() {
         }
     });
     std::cerr << "total take: " << time << " s       \n";
+}
+
+void scene4() {
+    HittablesRecord objs;
+    objs.push_back(std::make_shared<Sphere>(
+        Point3(0, -100, -1), 100,
+        std::make_shared<lambertian>(Color{0.7, 0.7, 0.7})));
+    std::shared_ptr<material> mat =
+        std::make_shared<lambertian_texture>(new test_texture());
+
+    objs.push_back(std::make_shared<triangle>(Vec3{0, 0, 0}, Vec3{1, 0, 0},
+                                              Vec3{1, 1, 0}, Vec2{0, 0},
+                                              Vec2{1, 0}, Vec2{1, 1}, mat));
+
+    objs.push_back(std::make_shared<triangle>(Vec3{0, 1, 0}, Vec3{0, 0, 0},
+                                              Vec3{1, 1, 0}, Vec2{0, 1},
+                                              Vec2{0, 0}, Vec2{1, 1}, mat));
+
+    objs.push_back(std::make_shared<Sphere>(Vec3{-1, 0.5, 0}, 0.5, mat));
+    auto bvh = bvh_node::create(objs.begin(), objs.end());
+    for (int frame = 0; frame < 30; frame++) {
+        Camera camera(
+            16, 9, degrees_to_radians(45),
+            {frame_rotation(29, frame, 3.0, 0.5), Vec3{0, 0, 0}, Vec3{0, 1, 0}},
+            degrees_to_radians(0.5), 0.5);
+
+        Renderer().render(bvh, camera);
+    }
 }
