@@ -2,7 +2,6 @@
 #define INCLUDE_SRC_VEC2_HPP_
 
 #include <cmath>
-#include <type_traits>
 struct Vec2 {
     float e[2];
 

@@ -5,7 +5,6 @@
 #include <xmmintrin.h>
 
 #include <cmath>
-#include <csignal>
 #include <iostream>
 #include <ostream>
 

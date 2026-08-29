@@ -4,8 +4,10 @@
 **.so
 **.dll
 **.lib
+**.pch
 **/.cache
 **/out.png
+**/out.mp4
 **/build
 **/cmake-*
 

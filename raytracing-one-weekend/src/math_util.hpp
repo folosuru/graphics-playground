@@ -1,7 +1,6 @@
 #ifndef INCLUDE_SRC_MATH_UTIL_HPP_
 #define INCLUDE_SRC_MATH_UTIL_HPP_
 
-#include <cmath>
 #include <limits>
 #include <random>
 
