@@ -5,6 +5,7 @@
 
 #include "camera.hpp"
 #include "hittables.hpp"
+#include "image/image_file.hpp"
 #include "material.hpp"
 #include "math_util.hpp"
 #include "obj_loader.hpp"
@@ -133,6 +134,25 @@ void scene4() {
         Camera camera(
             16, 9, degrees_to_radians(45),
             {frame_rotation(29, frame, 3.0, 0.5), Vec3{0, 0, 0}, Vec3{0, 1, 0}},
+            degrees_to_radians(0.5), 0.5);
+
+        Renderer().render(bvh, camera);
+    }
+}
+
+void scene5() {
+    HittablesRecord objs;
+
+    auto earth = image_file::create("models/Equirectangular-projection.jpg");
+    std::shared_ptr<material> mat =
+        std::make_shared<lambertian_texture>(new image_texture(earth));
+
+    objs.push_back(std::make_shared<Sphere>(Vec3{0, 0, 0}, 0.75, mat));
+    auto bvh = bvh_node::create(objs.begin(), objs.end());
+    for (int frame = 0; frame < 30; frame++) {
+        Camera camera(
+            16, 9, degrees_to_radians(45),
+            {frame_rotation(31, frame, 3.0, 0.5), Vec3{0, 0, 0}, Vec3{0, 1, 0}},
             degrees_to_radians(0.5), 0.5);
 
         Renderer().render(bvh, camera);

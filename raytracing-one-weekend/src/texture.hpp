@@ -1,5 +1,6 @@
 #ifndef INCLUDE_SRC_TEXTURE_HPP_
 #define INCLUDE_SRC_TEXTURE_HPP_
+#include "image/image_file.hpp"
 #include "vec2.hpp"
 #include "vec3.hpp"
 
@@ -21,6 +22,19 @@ public:
 
 class test_texture : public texture {
     Color get(Vec2 v) const override { return Color{v[0], 0.5, v[1]}; }
+};
+
+class image_texture : public texture {
+public:
+    image_texture(image_file *file_) : file(file_) {}
+
+    Color get(Vec2 uv) const override {
+        uv[1] = 1 - uv[1];
+        return file->get_pixel(uv);
+    }
+
+private:
+    image_file *file;
 };
 
 #endif  // INCLUDE_SRC_TEXTURE_HPP_

@@ -2,9 +2,11 @@
 **/out
 **.a
 **.so
+**.o
 **.dll
 **.lib
 **.pch
+**.gch
 **/.cache
 **/out.png
 **/out.mp4

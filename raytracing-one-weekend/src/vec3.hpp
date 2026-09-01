@@ -24,6 +24,10 @@ struct alignas(16) Vec3 {
         : e{e0, e1, e2, e3} {}
     Vec3(__m128 v_) : v(v_) {}
 
+    static Vec3 from_unalign_array(const float *p) {
+        return {p[0], p[1], p[2]};
+    }
+
     template<typename T, typename U, typename V>
     explicit Vec3(T e0, U e1, V e2)
         : Vec3(static_cast<RealType>(e0), static_cast<RealType>(e1),

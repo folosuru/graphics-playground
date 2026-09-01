@@ -1,7 +1,10 @@
 #ifndef INCLUDE_SRC_SPHERE_HPP_
 #define INCLUDE_SRC_SPHERE_HPP_
+#include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <ios>
+#include <limits>
 #include <memory>
 
 #include "hittable.hpp"
@@ -26,7 +29,8 @@ public:
         // phi: XZ軸の角度。Z=-1、X=1 -> Z=1 -> X=-1の向きで回転する。
         //      なお、定義域が-pi <= std::atan2() <= pi のため、piを加算して半周ずらす。
         //
-        auto theta = std::acos(-point.y()) / pi;
+        auto y = std::clamp(point.y(), -1.0f, 1.0f);
+        auto theta = std::acos(-y) / pi;
         auto phi = (std::atan2(-point.z(), point.x()) + pi) / (2 * pi);
         assert(0 <= phi);
         assert(0 <= theta);

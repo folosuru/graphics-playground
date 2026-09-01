@@ -1,0 +1,3 @@
+[submodule "raytracing-one-weekend/src/thiredparty/stb"]
+	path = raytracing-one-weekend/src/thiredparty/stb
+	url = https://github.com/nothings/stb
